@@ -3,6 +3,111 @@ const map = L.map('map', {
   zoomControl: true
 }).setView([19.43, -99.13], 10);
 
+// Capa para dibujos
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+// Control de dibujo
+var drawControl = new L.Control.Draw({
+  draw: {
+    polyline: {
+      shapeOptions: { color: '#7A1E2C' }
+    },
+    polygon: {
+      allowIntersection: false,
+      showArea: true,
+      shapeOptions: { color: '#C9A14A' }
+    },
+    rectangle: false,
+    circle: false,
+    marker: false,
+    circlemarker: false
+  },
+  edit: {
+    featureGroup: drawnItems
+  }
+});
+
+map.addControl(drawControl);
+
+// Evento al dibujar
+map.on(L.Draw.Event.CREATED, function (event) {
+  drawnItems.addLayer(event.layer);
+});
+
+const locateControl = L.control({ position: 'topleft' });
+
+locateControl.onAdd = function () {
+  const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+
+  const button = L.DomUtil.create('a', 'leaflet-custom-tool', container);
+  button.href = '#';
+  button.title = 'Mi ubicación';
+  button.innerHTML = '📍';
+
+  L.DomEvent.disableClickPropagation(button);
+  L.DomEvent.on(button, 'click', function (e) {
+    L.DomEvent.preventDefault(e);
+    map.locate({ setView: true, maxZoom: 16 });
+  });
+
+  return container;
+};
+
+locateControl.addTo(map);
+
+// Mostrar marcador
+let userLocationMarker = null;
+
+const iconoUbicacion = L.icon({
+  iconUrl: 'assets/icons/ubicacion.svg',
+  iconSize: [38, 38],
+  iconAnchor: [19, 19],
+  popupAnchor: [0, -18]
+});
+
+map.on('locationfound', function (e) {
+  if (userLocationMarker) {
+    userLocationMarker.setLatLng(e.latlng);
+  } else {
+    userLocationMarker = L.marker(e.latlng, {
+      icon: iconoUbicacion,
+      zIndexOffset: 2000
+    }).addTo(map);
+  }
+
+  userLocationMarker.bindPopup('Tu ubicación aproximada').openPopup();
+});
+
+var initialView = {
+  center: map.getCenter(),
+  zoom: map.getZoom()
+};
+
+const resetControl = L.control({ position: 'topleft' });
+
+resetControl.onAdd = function () {
+  const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+  div.innerHTML = `
+    <div class="leaflet-custom-tool" title="Restablecer vista" aria-label="Restablecer vista">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5a7 7 0 1 1-6.3 9.9 1 1 0 1 1 1.8-.8A5 5 0 1 0 8 8h2.5a1 1 0 0 1 0 2H5.8a1 1 0 0 1-1-1V4.2a1 1 0 1 1 2 0V6A6.9 6.9 0 0 1 12 5z"/>
+      </svg>
+    </div>
+  `;
+
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.on(div, 'click', function () {
+    map.setView(initialView.center, initialView.zoom);
+  });
+
+  return div;
+};
+
+resetControl.addTo(map);
+
+L.control.scale().addTo(map);
+
 // 2. Capa base
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap'

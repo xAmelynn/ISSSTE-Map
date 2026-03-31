@@ -415,3 +415,46 @@ body.filtros-colapsados #map { height: calc(100vh - 72px); }
   #map { height: calc(100vh - 112px - 306px); }
   body.filtros-colapsados #map { height: calc(100vh - 112px); }
 }
+
+/* ===== Herramientas del mapa: estilo bonito ===== */
+
+.leaflet-top.leaflet-left {
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
+.leaflet-control-zoom,
+.leaflet-draw,
+.leaflet-control-fullscreen,
+.leaflet-control-scale {
+  border: none !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+.leaflet-bar {
+  border: none !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(6px);
+}
+
+.leaflet-custom-tool {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--vino);
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.leaflet-custom-tool:hover {
+  background: #f5e9ec;
+}
